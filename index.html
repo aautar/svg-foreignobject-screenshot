@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+    <meta charset="utf-8">
+
+    <head></head>
+
+    <body>
+
+        <div id="snapshotContainer"></div>
+
+        <script type="text/javascript">
+        
+            const buildSvgDataUri = function(contentHtml) {
+
+                const contentRootElem = document.createElement("div");
+                contentRootElem.innerHTML = contentHtml;
+                contentRootElem.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+
+                contentRootElemString = new XMLSerializer().serializeToString(contentRootElem);
+
+                const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='960' height='850'><g transform='translate(300, 0) rotate(20)'><foreignObject x='0' y='0' width='800' height='800'>${contentRootElemString}</foreignObject></g></svg>`;
+
+                const dataUri = `data:image/svg+xml;base64,${window.btoa(svg)}`;
+
+                return dataUri;
+            };
+
+
+            const img = new Image();
+            img.src = buildSvgDataUri(`<p style="font-family:century gothic; font-weight:bold;">test</p>`);
+
+            img.onload = function() {
+                document.getElementById(`snapshotContainer`).appendChild(img);
+            };
+
+        </script>
+
+
+    </body>
+
+
+</html>
