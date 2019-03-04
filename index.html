@@ -3,9 +3,26 @@
 
     <meta charset="utf-8">
 
-    <head></head>
+    <head>
+
+        <style type="text/css">
+            @font-face {
+                font-family: 'BebasNeue';
+                src: url('bebas-neue-regular.otf');
+                font-weight: 600;
+                font-style: normal;
+            }
+
+            
+            p { font-family:"BebasNeue"; color:#00f; }
+        
+        </style>
+
+    </head>
 
     <body>
+
+        <p>xyz</p>
 
         <div id="snapshotContainer"></div>
 
@@ -13,11 +30,30 @@
         
             const buildSvgDataUri = function(contentHtml) {
 
+                const styleElem = document.createElement("style");
+                styleElem.innerHTML =                 
+                 `
+                    <style type="text/css">
+                        @font-face {
+                            font-family: 'BebasNeue';
+                            src: url('bebas-neue-regular.otf');
+                            font-weight: 600;
+                            font-style: normal;
+                        }
+
+                        
+                        p { font-family:"BebasNeue"; color:#00f; font-size:22px; }
+                    
+                    </style>
+                    
+                `;
+                const styleElemString = new XMLSerializer().serializeToString(styleElem);
+
                 const contentRootElem = document.createElement("div");
-                contentRootElem.innerHTML = contentHtml;
+                contentRootElem.innerHTML = styleElemString + contentHtml;
                 contentRootElem.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
 
-                contentRootElemString = new XMLSerializer().serializeToString(contentRootElem);
+                const contentRootElemString = new XMLSerializer().serializeToString(contentRootElem);
 
                 const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='960' height='850'><g transform='translate(300, 0) rotate(20)'><foreignObject x='0' y='0' width='800' height='800'>${contentRootElemString}</foreignObject></g></svg>`;
 
@@ -28,7 +64,7 @@
 
 
             const img = new Image();
-            img.src = buildSvgDataUri(`<p style="font-family:century gothic; font-weight:bold;">test</p>`);
+            img.src = buildSvgDataUri(`<p>test</p>`);
 
             img.onload = function() {
                 document.getElementById(`snapshotContainer`).appendChild(img);
