@@ -152,4 +152,25 @@ const HtmlRenderer = function() {
             };
         });
     };
+
+    /**
+     * @param {String} html
+     * @return {Image}
+     */
+    this.renderToCanvas = async function(html) {
+        return new Promise(async function(resolve, reject) {
+            const img = new Image();
+            img.src = await buildSvgDataUri(html);
+    
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var canvasCtx = canvas.getContext('2d');
+                canvasCtx.drawImage(img, 0, 0, img.width, img.height);
+                resolve(canvas);
+            };
+        });
+    };    
+
 };

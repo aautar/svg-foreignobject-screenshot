@@ -16,8 +16,8 @@
 
             const renderer = new HtmlRenderer();
             renderer
-                .renderToImage(`
-                    <div style="border:2px solid #2687ea; padding:25px; border-radius:25px;">
+                .renderToCanvas(`
+                    <div style="background:#fff; border:2px solid #2687ea; padding:25px; border-radius:25px;">
 
                         <!-- text rendering -->
                         <p>ABC ^ XYZ:</p>
@@ -33,8 +33,8 @@
 
                     </div>
                 `)
-                .then((img) => {
-                    document.getElementById(`snapshotContainer`).appendChild(img);
+                .then((c) => {
+                    document.getElementById(`snapshotContainer`).appendChild(c);
                 });          
 
         </script>
