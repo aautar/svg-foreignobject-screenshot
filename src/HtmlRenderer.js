@@ -1,5 +1,7 @@
 const HtmlRenderer = function() {
 
+    const self = this;
+
     const binaryStringToBase64 = function(binStr) {
         return new Promise(function(resolve) {
             const reader = new FileReader();
@@ -159,18 +161,24 @@ const HtmlRenderer = function() {
      */
     this.renderToCanvas = async function(html) {
         return new Promise(async function(resolve, reject) {
-            const img = new Image();
-            img.src = await buildSvgDataUri(html);
-    
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                var canvasCtx = canvas.getContext('2d');
-                canvasCtx.drawImage(img, 0, 0, img.width, img.height);
-                resolve(canvas);
-            };
+            const img = await self.renderToImage(html);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            const canvasCtx = canvas.getContext('2d');
+            canvasCtx.drawImage(img, 0, 0, img.width, img.height);
+
+            resolve(canvas);
         });
     };    
+
+    this.renderToBase64Png = async function(html) {
+        return new Promise(async function(resolve, reject) {
+            const canvas = await self.renderToCanvas(html);
+            resolve(canvas.toDataURL('image/png'));
+        });
+    };
 
 };
