@@ -29,7 +29,7 @@ const ForeignHtmlRenderer = function() {
         });
     };
 
-    const removeQutoes = function(str) {
+    const removeQuotes = function(str) {
         return str.replace(/["']/g, "");
     };    
 
@@ -53,7 +53,7 @@ const ForeignHtmlRenderer = function() {
             
             searchStartIndex = idx + 1;
 
-            urlsFound.push(removeQutoes(url));
+            urlsFound.push(removeQuotes(url));
         }
 
         return urlsFound;
@@ -79,7 +79,7 @@ const ForeignHtmlRenderer = function() {
             
             searchStartIndex = idx + 1;
 
-            urlsFound.push(removeQutoes(url));
+            urlsFound.push(removeQuotes(url));
         }
 
         return urlsFound;
