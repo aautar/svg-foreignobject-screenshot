@@ -2,6 +2,10 @@ const ForeignHtmlRenderer = function() {
     
     const self = this;
 
+    /**
+     * 
+     * @param {String} binStr 
+     */
     const binaryStringToBase64 = function(binStr) {
         return new Promise(function(resolve) {
             const reader = new FileReader();
@@ -12,6 +16,10 @@ const ForeignHtmlRenderer = function() {
         });     
     };
 
+    /**
+     * 
+     * @param {String} url 
+     */
     const getResourceAsBase64 = function(url) {
         return new Promise(function(resolve, reject) {
             const xhr = new XMLHttpRequest();
@@ -21,7 +29,12 @@ const ForeignHtmlRenderer = function() {
             xhr.onreadystatechange = async function() {
                 if(xhr.readyState === 4 && xhr.status === 200) {
                     const resBase64 = await binaryStringToBase64(xhr.response);
-                    resolve(resBase64);
+                    resolve(
+                        {
+                            "resourceUrl": url,
+                            "resourceBase64": resBase64
+                        }
+                    );
                 }
             };
 
@@ -29,10 +42,30 @@ const ForeignHtmlRenderer = function() {
         });
     };
 
+    /**
+     * 
+     * @param {String[]} urls 
+     */
+    const getMultipleResourcesAsBase64 = function(urls) {
+        const promises = [];
+        for(let i=0; i<urls.length; i++) {
+            promises.push( getResourceAsBase64(urls[i]) );
+        }
+        return Promise.all(promises);
+    };
+
+    /**
+     * 
+     * @param {String} str 
+     */
     const removeQuotes = function(str) {
         return str.replace(/["']/g, "");
     };    
 
+    /**
+     * 
+     * @param {String} cssRuleStr 
+     */
     const getUrlsFromCssString = function(cssRuleStr) {
         const urlsFound = [];
         let searchStartIndex = 0;
@@ -59,6 +92,10 @@ const ForeignHtmlRenderer = function() {
         return urlsFound;
     };    
 
+    /**
+     * 
+     * @param {String} html 
+     */
     const getImageUrlsFromFromHtml = function(html) {
         const urlsFound = [];
         let searchStartIndex = 0;
@@ -85,6 +122,10 @@ const ForeignHtmlRenderer = function() {
         return urlsFound;
     };
 
+    /**
+     * 
+     * @param {String} contentHtml 
+     */
     const buildSvgDataUri = async function(contentHtml) {
 
         return new Promise(async function(resolve, reject) {
@@ -96,26 +137,28 @@ const ForeignHtmlRenderer = function() {
 
             // copy styles
             let cssStyles = "";
-            let urlsFound = [];
+            let urlsFoundInCss = [];
 
             for (let i=0; i<document.styleSheets.length; i++) {
                 for(let j=0; j<document.styleSheets[i].cssRules.length; j++) {
                     const cssRuleStr = document.styleSheets[i].cssRules[j].cssText;
-                    urlsFound.push( ...getUrlsFromCssString(cssRuleStr) );
+                    urlsFoundInCss.push( ...getUrlsFromCssString(cssRuleStr) );
                     cssStyles += cssRuleStr;
                 }
             }
 
-            for(let i=0; i<urlsFound.length; i++) {
-                const resBase64 = await getResourceAsBase64(urlsFound[i]);
-                cssStyles = cssStyles.replace(new RegExp(urlsFound[i],"g"), resBase64);
+            const fetchedResourcesFromStylesheets = await getMultipleResourcesAsBase64(urlsFoundInCss);
+            for(let i=0; i<fetchedResourcesFromStylesheets.length; i++) {
+                const r = fetchedResourcesFromStylesheets[i];
+                cssStyles = cssStyles.replace(new RegExp(r.resourceUrl,"g"), r.resourceBase64);
             }
 
             let urlsFoundInHtml = getImageUrlsFromFromHtml(contentHtml);
-            for(let i=0; i<urlsFoundInHtml.length; i++) {
-                const resBase64 = await getResourceAsBase64(urlsFoundInHtml[i]);
-                contentHtml = contentHtml.replace(new RegExp(urlsFoundInHtml[i],"g"), resBase64);
-            }            
+            const fetchedResources = await getMultipleResourcesAsBase64(urlsFoundInHtml);
+            for(let i=0; i<fetchedResources.length; i++) {
+                const r = fetchedResources[i];
+                contentHtml = contentHtml.replace(new RegExp(r.resourceUrl,"g"), r.resourceBase64);
+            }
 
             const styleElem = document.createElement("style");
             styleElem.innerHTML = cssStyles;
@@ -174,6 +217,10 @@ const ForeignHtmlRenderer = function() {
         });
     };    
 
+    /**
+     * @param {String} html
+     * @return {String}
+     */
     this.renderToBase64Png = async function(html) {
         return new Promise(async function(resolve, reject) {
             const canvas = await self.renderToCanvas(html);
