@@ -1,4 +1,8 @@
-const ForeignHtmlRenderer = function() {
+/**
+ * 
+ * @param {StyleSheetList} styleSheets 
+ */
+const ForeignHtmlRenderer = function(styleSheets) {
     
     const self = this;
 
@@ -139,9 +143,9 @@ const ForeignHtmlRenderer = function() {
             let cssStyles = "";
             let urlsFoundInCss = [];
 
-            for (let i=0; i<document.styleSheets.length; i++) {
-                for(let j=0; j<document.styleSheets[i].cssRules.length; j++) {
-                    const cssRuleStr = document.styleSheets[i].cssRules[j].cssText;
+            for (let i=0; i<styleSheets.length; i++) {
+                for(let j=0; j<styleSheets[i].cssRules.length; j++) {
+                    const cssRuleStr = styleSheets[i].cssRules[j].cssText;
                     urlsFoundInCss.push( ...getUrlsFromCssString(cssRuleStr) );
                     cssStyles += cssRuleStr;
                 }
