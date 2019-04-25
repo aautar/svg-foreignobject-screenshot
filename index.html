@@ -16,7 +16,12 @@
 
             const renderer = new HtmlRenderer();
             renderer
-                .renderToImage(`<p style="border:2px solid #0ff; padding:25px; border-radius:25px;">ABC ^ XYZ: <img src="test-bigfoot.svg" width="64" /></p>`)
+                .renderToImage(`
+                    <div style="border:2px solid #2687ea; padding:25px; border-radius:25px;">
+                        <p>ABC ^ XYZ:</p>
+                        <div><img src="test-bigfoot.svg" width="64" /></div>
+                    </div>
+                `)
                 .then((img) => {
                     document.getElementById(`snapshotContainer`).appendChild(img);
                 });          

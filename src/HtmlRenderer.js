@@ -1,18 +1,25 @@
 const HtmlRenderer = function() {
 
+    const binaryStringToBase64 = function(binStr) {
+        return new Promise(function(resolve) {
+            const reader = new FileReader();
+            reader.readAsDataURL(binStr); 
+            reader.onloadend = function() {
+                resolve(reader.result);
+            }  
+        });     
+    };
+
     const getResourceAsBase64 = function(url) {
         return new Promise(function(resolve, reject) {
             const xhr = new XMLHttpRequest();
             xhr.open("GET", url);
             xhr.responseType = 'blob';
 
-            xhr.onreadystatechange = function() {
+            xhr.onreadystatechange = async function() {
                 if(xhr.readyState === 4 && xhr.status === 200) {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(xhr.response); 
-                    reader.onloadend = function() {
-                        resolve(reader.result);
-                    }                               
+                    const resBase64 = await binaryStringToBase64(xhr.response);
+                    resolve(resBase64);
                 }
             };
 
