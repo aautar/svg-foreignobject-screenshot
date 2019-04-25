@@ -5,7 +5,7 @@
 
     <head>
         <link rel="stylesheet" type="text/css" href="styles.css" /> 
-        <script src="src/HtmlRenderer.js" type="text/javascript"></script>
+        <script src="src/ForeignHtmlRenderer.js" type="text/javascript"></script>
     </head>
 
     <body>
@@ -14,7 +14,7 @@
 
         <script type="text/javascript">
 
-            const renderer = new HtmlRenderer();
+            const renderer = new ForeignHtmlRenderer();
             renderer
                 .renderToBase64Png(`
                     <div style="background:#fff; border:2px solid #2687ea; padding:25px; border-radius:25px;">

@@ -1,5 +1,5 @@
-const HtmlRenderer = function() {
-
+const ForeignHtmlRenderer = function() {
+    
     const self = this;
 
     const binaryStringToBase64 = function(binStr) {
