@@ -28,7 +28,7 @@ const HtmlRenderer = function() {
     };
 
     const removeQutoes = function(str) {
-        return str.replace(/['"]+/g, '');
+        return str.replace(/["']/g, "");
     };    
 
     const getUrlsFromCssString = function(cssRuleStr) {
@@ -69,7 +69,7 @@ const HtmlRenderer = function() {
 
             let url = "";
             for(let i=idx+5; i<html.length; i++) {
-                if(html[i] === '"') {
+                if(html[i] === '"' || html[i] === "'") {
                     break;
                 }
                 url += html[i];
@@ -106,13 +106,13 @@ const HtmlRenderer = function() {
 
             for(let i=0; i<urlsFound.length; i++) {
                 const resBase64 = await getResourceAsBase64(urlsFound[i]);
-                cssStyles = cssStyles.replace(`"${urlsFound[i]}"`, resBase64);
+                cssStyles = cssStyles.replace(new RegExp(urlsFound[i],"g"), resBase64);
             }
 
             let urlsFoundInHtml = getImageUrlsFromFromHtml(contentHtml);
             for(let i=0; i<urlsFoundInHtml.length; i++) {
                 const resBase64 = await getResourceAsBase64(urlsFoundInHtml[i]);
-                contentHtml = contentHtml.replace(`"${urlsFoundInHtml[i]}"`, resBase64);
+                contentHtml = contentHtml.replace(new RegExp(urlsFoundInHtml[i],"g"), resBase64);
             }            
 
             const styleElem = document.createElement("style");

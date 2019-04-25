@@ -18,8 +18,19 @@
             renderer
                 .renderToImage(`
                     <div style="border:2px solid #2687ea; padding:25px; border-radius:25px;">
+
+                        <!-- text rendering -->
                         <p>ABC ^ XYZ:</p>
+
+                        <!-- image rendering -->
                         <div><img src="test-bigfoot.svg" width="64" /></div>
+
+                        <!-- background image rendering -->
+                        <div style="background:url(test-bigfoot.svg) center center repeat-x; width:500px; height:100px;"></div>
+
+                        <!-- background image rendering via CSS stylesheet-->
+                        <div class="bg-image-pattern"></div>                        
+
                     </div>
                 `)
                 .then((img) => {

@@ -7,3 +7,10 @@
 
 
 p { font-family:"BebasNeue"; color:#00f; }
+
+.bg-image-pattern { 
+    background:url(test-bigfoot.svg) center center repeat-x;
+    background-color: #666;
+    width: 600px;
+    height: 125px;
+}
