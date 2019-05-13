@@ -64,7 +64,34 @@ const ForeignHtmlRenderer = function(styleSheets) {
      */
     const removeQuotes = function(str) {
         return str.replace(/["']/g, "");
-    };    
+    };
+    
+    /**
+     * 
+     * @param {String} str 
+     * @param {Number} startIndex 
+     * @param {String} prefixToken 
+     * @param {String[]} suffixTokens
+     * 
+     * @returns {String|null} 
+     */
+    const parseValue = function(str, startIndex, prefixToken, suffixTokens) {
+        const idx = str.indexOf(prefixToken, startIndex);
+        if(idx === -1) {
+            return null;
+        }
+
+        let val = '';
+        for(let i=idx+prefixToken.length; i<str.length; i++) {
+            if(suffixTokens.indexOf(str[i]) !== -1) {
+                break;
+            }
+
+            val += str[i];
+        }
+
+        return val;
+    };
 
     /**
      * 
@@ -75,21 +102,12 @@ const ForeignHtmlRenderer = function(styleSheets) {
         let searchStartIndex = 0;
 
         while(true) {
-            const idx = cssRuleStr.indexOf("url(", searchStartIndex);
-            if(idx === -1) {
+            const url = parseValue(cssRuleStr, searchStartIndex, "url(", [')']);
+            if(url === null) {
                 break;
             }
 
-            let url = "";
-            for(let i=idx+4; i<cssRuleStr.length; i++) {
-                if(cssRuleStr[i] === ')') {
-                    break;
-                }
-                url += cssRuleStr[i];
-            }
-            
-            searchStartIndex = idx + 1;
-
+            searchStartIndex += url.length;
             urlsFound.push(removeQuotes(url));
         }
 
@@ -105,21 +123,12 @@ const ForeignHtmlRenderer = function(styleSheets) {
         let searchStartIndex = 0;
 
         while(true) {
-            const idx = html.indexOf("src=", searchStartIndex);
-            if(idx === -1) {
+            const url = parseValue(html, searchStartIndex, 'src=', [' ', '>', '\t']);
+            if(url === null) {
                 break;
             }
 
-            let url = "";
-            for(let i=idx+5; i<html.length; i++) {
-                if(html[i] === '"' || html[i] === "'") {
-                    break;
-                }
-                url += html[i];
-            }
-            
-            searchStartIndex = idx + 1;
-
+            searchStartIndex = searchStartIndex + url.length;
             urlsFound.push(removeQuotes(url));
         }
 
@@ -177,13 +186,19 @@ const ForeignHtmlRenderer = function(styleSheets) {
             const contentRootElemString = new XMLSerializer().serializeToString(contentRootElem);
 
             // build SVG string
-            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='960' height='850'><g transform='translate(0, 0) rotate(0)'><foreignObject x='0' y='0' width='800' height='800'>${contentRootElemString}</foreignObject></g></svg>`;
+            const svg = `
+                <svg xmlns='http://www.w3.org/2000/svg' width='960' height='850'>
+                    <g transform='translate(0, 0) rotate(0)'>
+                        <foreignObject x='0' y='0' width='800' height='800'>
+                            ${contentRootElemString}
+                        </foreignObject>
+                    </g>
+                </svg>`;
 
             // convert SVG to data-uri
             const dataUri = `data:image/svg+xml;base64,${window.btoa(svg)}`;
 
             resolve(dataUri);                    
-
         });
     };
 
