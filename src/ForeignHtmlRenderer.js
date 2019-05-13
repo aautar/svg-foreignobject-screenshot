@@ -138,8 +138,12 @@ const ForeignHtmlRenderer = function(styleSheets) {
     /**
      * 
      * @param {String} contentHtml 
+     * @param {Number} width
+     * @param {Number} height
+     * 
+     * @returns {Promise<String>}
      */
-    const buildSvgDataUri = async function(contentHtml) {
+    const buildSvgDataUri = async function(contentHtml, width, height) {
 
         return new Promise(async function(resolve, reject) {
 
@@ -187,9 +191,9 @@ const ForeignHtmlRenderer = function(styleSheets) {
 
             // build SVG string
             const svg = `
-                <svg xmlns='http://www.w3.org/2000/svg' width='960' height='850'>
+                <svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'>
                     <g transform='translate(0, 0) rotate(0)'>
-                        <foreignObject x='0' y='0' width='800' height='800'>
+                        <foreignObject x='0' y='0' width='${width}' height='${height}'>
                             ${contentRootElemString}
                         </foreignObject>
                     </g>
@@ -204,12 +208,15 @@ const ForeignHtmlRenderer = function(styleSheets) {
 
     /**
      * @param {String} html
-     * @return {Image}
+     * @param {Number} width
+     * @param {Number} height
+     * 
+     * @return {Promise<Image>}
      */
-    this.renderToImage = async function(html) {
+    this.renderToImage = async function(html, width, height) {
         return new Promise(async function(resolve, reject) {
             const img = new Image();
-            img.src = await buildSvgDataUri(html);
+            img.src = await buildSvgDataUri(html, width, height);
     
             img.onload = function() {
                 resolve(img);
@@ -219,11 +226,14 @@ const ForeignHtmlRenderer = function(styleSheets) {
 
     /**
      * @param {String} html
-     * @return {Image}
+     * @param {Number} width
+     * @param {Number} height
+     * 
+     * @return {Promise<Image>}
      */
-    this.renderToCanvas = async function(html) {
+    this.renderToCanvas = async function(html, width, height) {
         return new Promise(async function(resolve, reject) {
-            const img = await self.renderToImage(html);
+            const img = await self.renderToImage(html, width, height);
 
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
@@ -238,11 +248,14 @@ const ForeignHtmlRenderer = function(styleSheets) {
 
     /**
      * @param {String} html
-     * @return {String}
+     * @param {Number} width
+     * @param {Number} height
+     * 
+     * @return {Promise<String>}
      */
-    this.renderToBase64Png = async function(html) {
+    this.renderToBase64Png = async function(html, width, height) {
         return new Promise(async function(resolve, reject) {
-            const canvas = await self.renderToCanvas(html);
+            const canvas = await self.renderToCanvas(html, width, height);
             resolve(canvas.toDataURL('image/png'));
         });
     };

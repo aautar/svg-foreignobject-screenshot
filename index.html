@@ -32,7 +32,9 @@
                         <div class="bg-image-pattern"></div>                        
 
                     </div>
-                `)
+                `,
+                1024,
+                768)
                 .then((base64png) => {
                     document.getElementById(`snapshotContainer`).innerHTML = `<img src="${base64png}" />`;
                 });          
