@@ -63,14 +63,6 @@ const ForeignHtmlRenderer = function(styleSheets) {
     /**
      * 
      * @param {String} str 
-     */
-    const removeQuotes = function(str) {
-        return str.replace(/["']/g, "");
-    };
-    
-    /**
-     * 
-     * @param {String} str 
      * @param {Number} startIndex 
      * @param {String} prefixToken 
      * @param {String[]} suffixTokens
@@ -92,7 +84,10 @@ const ForeignHtmlRenderer = function(styleSheets) {
             val += str[i];
         }
 
-        return val;
+        return {
+            "foundAtIndex": idx,
+            "value": val
+        }
     };
 
     /**
@@ -137,6 +132,15 @@ const ForeignHtmlRenderer = function(styleSheets) {
         }
 
         return urlsFound;
+    };
+
+    /**
+     * 
+     * @param {String} str
+     * @returns {String}
+     */
+    const removeQuotes = function(str) {
+        return str.replace(/["']/g, "");
     };
 
     const escapeRegExp = function(string) {
