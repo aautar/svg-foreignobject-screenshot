@@ -23,6 +23,7 @@ const ForeignHtmlRenderer = function(styleSheets) {
     /**
      * 
      * @param {String} url 
+     * @returns {Promise}
      */
     const getResourceAsBase64 = function(url) {
         return new Promise(function(resolve, reject) {
@@ -49,6 +50,7 @@ const ForeignHtmlRenderer = function(styleSheets) {
     /**
      * 
      * @param {String[]} urls 
+     * @returns {Promise}
      */
     const getMultipleResourcesAsBase64 = function(urls) {
         const promises = [];
@@ -96,6 +98,7 @@ const ForeignHtmlRenderer = function(styleSheets) {
     /**
      * 
      * @param {String} cssRuleStr 
+     * @returns {String[]}
      */
     const getUrlsFromCssString = function(cssRuleStr) {
         const urlsFound = [];
@@ -107,8 +110,8 @@ const ForeignHtmlRenderer = function(styleSheets) {
                 break;
             }
 
-            searchStartIndex += url.length;
-            urlsFound.push(removeQuotes(url));
+            searchStartIndex = url.foundAtIndex + url.value.length;
+            urlsFound.push(removeQuotes(url.value));
         }
 
         return urlsFound;
@@ -117,6 +120,7 @@ const ForeignHtmlRenderer = function(styleSheets) {
     /**
      * 
      * @param {String} html 
+     * @returns {String[]}
      */
     const getImageUrlsFromFromHtml = function(html) {
         const urlsFound = [];
@@ -128,11 +132,15 @@ const ForeignHtmlRenderer = function(styleSheets) {
                 break;
             }
 
-            searchStartIndex = searchStartIndex + url.length;
-            urlsFound.push(removeQuotes(url));
+            searchStartIndex = url.foundAtIndex + url.value.length;
+            urlsFound.push(removeQuotes(url.value));
         }
 
         return urlsFound;
+    };
+
+    const escapeRegExp = function(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     };
 
     /**
@@ -167,14 +175,14 @@ const ForeignHtmlRenderer = function(styleSheets) {
             const fetchedResourcesFromStylesheets = await getMultipleResourcesAsBase64(urlsFoundInCss);
             for(let i=0; i<fetchedResourcesFromStylesheets.length; i++) {
                 const r = fetchedResourcesFromStylesheets[i];
-                cssStyles = cssStyles.replace(new RegExp(r.resourceUrl,"g"), r.resourceBase64);
+                cssStyles = cssStyles.replace(new RegExp(escapeRegExp(r.resourceUrl),"g"), r.resourceBase64);
             }
 
             let urlsFoundInHtml = getImageUrlsFromFromHtml(contentHtml);
             const fetchedResources = await getMultipleResourcesAsBase64(urlsFoundInHtml);
             for(let i=0; i<fetchedResources.length; i++) {
                 const r = fetchedResources[i];
-                contentHtml = contentHtml.replace(new RegExp(r.resourceUrl,"g"), r.resourceBase64);
+                contentHtml = contentHtml.replace(new RegExp(escapeRegExp(r.resourceUrl),"g"), r.resourceBase64);
             }
 
             const styleElem = document.createElement("style");
