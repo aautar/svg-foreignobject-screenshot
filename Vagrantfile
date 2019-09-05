@@ -10,7 +10,7 @@ if ! [ -L /var/www ]; then
 fi
 
 # Install nginx
-sudo apt-get install -y nginx=1.14.*
+sudo apt-get install -y nginx=1.16.*
 
 # Nginx
 if [ ! -f /etc/nginx/sites-available/vagrant ]; then
